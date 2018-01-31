@@ -1,0 +1,12 @@
+
+-- init database;
+
+DROP TABLE IF EXISTS Paths
+
+CREATE TABLE Paths (
+	id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	paths TEXT,
+	PRIMARY KEY (id)
+);
+
+
