@@ -1,0 +1,12 @@
+{
+  "name": "AudioPiPlayer--Ultimate",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "socket.io": "",
+    "express": ""
+    },
+  "author": "TERRUSS",
+  "license": "Unlicense"
+}
