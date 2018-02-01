@@ -9,6 +9,16 @@ const server = http.createServer(app);
 const io = require('socket.io')(server);
 
 const { exec } = require('child_process');
+const tracks = require('./tracks');
+
+const mysql = require('mysql');
+const connection = mysql.createConnection({
+	host: 'localhost',
+	user: 'root',
+	password: '',
+	database: 'audio_pi_player'
+});
+
 
 app.use(express.static(__dirname + '/public'));
 
@@ -27,25 +37,24 @@ var status = {
   //and the interseting stuff begin...
 io.sockets.on('connection', (socket) => {
 
-  socket.emit('init', status);
-  //XXX: socket.emit('trackList', trackList);
+  socket.emit('trackList', tracks.getList());
 
   //change song
   socket.on("chSong", (path) => {
     console.log("chSong : " + path);
 
-    // exec('play ' + path, (error, stdout, stderr) => {
-    //   if (error) {
-    //     console.log("ERROR : " + error);
-    //
-    //     socket.broadcast.emit('error', (stderr));
-    //     return;
-    //   }
-    //
+     exec('play ' + path, (error, stdout, stderr) => {
+       if (error) {
+         console.log("ERROR : " + error);
+    
+       	 socket.broadcast.emit('error', ('play', stderr));
+         return;
+       }
+    
       status.playing = path;
       status.pause = false;
-    //   console.log("STDOUT : " + stdout);
-    //   console.log("STDERR : " + stderr);
+      console.log("STDOUT : " + stdout);
+      console.log("STDERR : " + stderr);
       socket.broadcast.emit('chSong', path);
       socket.emit('chSong', path);
     });
