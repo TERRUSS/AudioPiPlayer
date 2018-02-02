@@ -12,7 +12,7 @@ const connection = mysql.createConnection({
 	exec('./refresh.sh', (error, stdout, stderr) => {
 		if (error) {
 			console.log('./refresh ERROR : ' + error);
-			socket.broadcast.emit('error', ('./refresh.sh', stderr));
+			socket.broadcast.emit('error', {location:'./refresh.sh', err:stderr});
 			return;
 		}
 
@@ -31,16 +31,19 @@ exports.refreshList = function() {
 	connection.connect();
 
 	connection.query('SELECT paths FROM paths', function (error, results,  fields) => {
-		if (error) throw error;
-		
-		let length = results.length;
-		for (let i=0; i<length; i++){
-			list[i] = results[i].solution;
-		}
-		return list;
-	});
+		if (error){
+			throw error;
+			socket.broadcast.emit('error', {location:'select', err:error});
+			return;
+		} else {
 
-	return false;
+			let length = results.length;
+			for (let i=0; i<length; i++){
+				list[i] = results[i].solution;
+			}
+			return list;
+		}
+	});
 }
 
 /*
