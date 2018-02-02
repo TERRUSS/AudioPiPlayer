@@ -1,5 +1,14 @@
 
- function refresh() {
+const mysql = require('mysql');
+const connection = mysql.createConnection({
+	host: 'localhost',
+	user: 'root',
+	password: '',
+	database: 'audio_pi_player'
+});
+
+
+ function refreshDB() {
 	exec('./refresh.sh', (error, stdout, stderr) => {
 		if (error) {
 			console.log('./refresh ERROR : ' + error);
@@ -12,14 +21,26 @@
 	});
 }
 
-exports.getLine = function() {
+exports.refreshList = function() {
+
 	refresh();
 
 		//SQL shit
 	//push all paths in an array i guess
-	//lets tryhard dud
+	var list = [];
+	connection.connect();
 
-	return list;
+	connection.query('SELECT paths FROM paths', function (error, results,  fields) => {
+		if (error) throw error;
+		
+		let length = results.length;
+		for (let i=0; i<length; i++){
+			list[i] = results[i].solution;
+		}
+		return list;
+	});
+
+	return false;
 }
 
 /*
