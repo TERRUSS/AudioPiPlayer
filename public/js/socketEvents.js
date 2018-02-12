@@ -1,5 +1,5 @@
 
-socket.on('init', (status) => {
+socket.on('status', (status) => {
   if(status.pause){
     $("#pause").html('>>');
   } else {
@@ -13,7 +13,7 @@ socket.on('init', (status) => {
 
 
 socket.on("trackList", (list) => {
-  $('#tracks.list').empty();
+  $('#tracklist').empty();
   for (let track of list) {
     new Track(track);
   }
@@ -26,6 +26,7 @@ socket.on('error', (stderr) => {
 
 socket.on("chSong", (track) => {
   $("#current #song").html(pathParse(track));    // TODO: parse path to track.name
+
 });
 
 socket.on('pause', (pause) => {
