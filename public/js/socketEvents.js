@@ -11,7 +11,9 @@ socket.on('init', (status) => {
   }
 })
 
+
 socket.on("trackList", (list) => {
+  $('#tracks.list').empty();
   for (let track of list) {
     new Track(track);
   }

@@ -8,17 +8,7 @@ const app = express();
 const server = http.createServer(app);
 const io = require('socket.io')(server);
 
-const { exec } = require('child_process');
-const tracks = require('./tracks');
-
-const mysql = require('mysql');
-const connection = mysql.createConnection({
-	host: 'localhost',
-	user: 'root',
-	password: '',
-	database: 'audio_pi_player'
-});
-
+const Tracks = require('./tracks');
 
 app.use(express.static(__dirname + '/public'));
 
@@ -34,10 +24,33 @@ var status = {
   pause: true
 }
 
-  //and the interseting stuff begin...
-io.sockets.on('connection', (socket) => {
 
-  socket.emit('trackList', tracks.getList());
+
+
+  //and the interseting stuff begin...
+
+var tracks = [];
+
+
+io.sockets.on('connection', (socket) => {
+ 
+  if (tracks != ''){
+    socket.emit('trackList', tracks);
+	  console.log('oui');
+  } else {
+    Tracks.refreshList();
+    socket.emit('trackList', tracks);
+  }
+
+	console.log('tracks : ' + tracks);
+  //refresh the tracklist
+  socket.on('refresh', () => {
+	  Tracks.refreshList();
+
+	  socket.broadcast.emit('trackList', tracks);
+	  socket.emit('trackList', tracks);
+  });
+
 
   //change song
   socket.on("chSong", (path) => {
@@ -58,6 +71,7 @@ io.sockets.on('connection', (socket) => {
       socket.broadcast.emit('chSong', path);
       socket.emit('chSong', path);
     });
+  });
 
   //pause
   socket.on('pause', () => {

@@ -7,7 +7,7 @@
     "socket.io": "",
     "express": "",
     "mysql": ""
-    },
+  },
   "author": "TERRUSS",
   "license": "Unlicense"
 }

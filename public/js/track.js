@@ -1,6 +1,7 @@
+
 class Track{
   constructor(data){
-    this.name = pathParse(data.path);   // TODO: parse path to track.name
+    this.name = pathParse(data.path);
     this.path = data.path;
 
     let track = $("<p>").addClass('clickable').appendTo("#tracks").html(this.name);
@@ -9,8 +10,6 @@ class Track{
     });
   }
 }
-
-
 
 
 function pathParse(path){

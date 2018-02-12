@@ -1,16 +1,21 @@
+	/* TRACKS.JS */
+
+
+const { execSync } = require('child_process');
 
 const mysql = require('mysql');
 const connection = mysql.createConnection({
-	host: 'localhost',
+	host: '127.0.0.1',
 	user: 'root',
 	password: '',
 	database: 'audio_pi_player'
 });
 
 
- function refreshDB() {
-	exec('./refresh.sh', (error, stdout, stderr) => {
+function refreshDB() {
+	execSync('/home/pi/Code/AudioPiPlayer/reload.sh', (error, stdout, stderr) => {
 		if (error) {
+			throw error;
 			console.log('./refresh ERROR : ' + error);
 			socket.broadcast.emit('error', {location:'./refresh.sh', err:stderr});
 			return;
@@ -23,23 +28,24 @@ const connection = mysql.createConnection({
 
 exports.refreshList = function() {
 
-	refresh();
+	refreshDB();
 
 		//SQL shit
 	//push all paths in an array i guess
 	var list = [];
-	connection.connect();
 
-	connection.query('SELECT paths FROM paths', function (error, results,  fields) => {
+	connection.connect();
+	connection.query('SELECT paths FROM paths', (error, results,  fields) => {
 		if (error){
 			throw error;
-			socket.broadcast.emit('error', {location:'select', err:error});
+		//	socket.broadcast.emit('error', {location:'select', err:error});
 			return;
 		} else {
-
+			console.log("PATHS : ");
 			let length = results.length;
 			for (let i=0; i<length; i++){
-				list[i] = results[i].solution;
+				list[i] = results[i].paths;
+				console.log(results[i].paths);
 			}
 			return list;
 		}
@@ -47,7 +53,5 @@ exports.refreshList = function() {
 }
 
 /*
- * TODO: refresh func
- * TODO: init function witch exec refresh()  && stock it in a var in order to send it to all newies
  * TODO: the 'refresh' button on index.html
  * */
