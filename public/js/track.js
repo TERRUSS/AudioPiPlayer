@@ -5,7 +5,7 @@ class Track{
     this.name = pathParse(path);
     this.path = path;
 
-    let track = $("<p>").addClass('clickable').appendTo("#tracks").html(this.path); 	//pathParse doesnt works, fu*k it for the moment
+    let track = $("<p>").addClass('clickable').appendTo("#tracks").html(this.name);
     track.on("click", () => { //OMFG check that binded callbck tho
       socket.emit("chSong", this.path);
     });
@@ -14,8 +14,7 @@ class Track{
 
 
 function pathParse(path){
-  let name = path.match(/[\w-]+\./) + "";
-  name = name.replace(/\.$/, '');
+	let name = path.replace(/\.(.*?)$/, '').replace(/(.*?)\/(?!.*\/)/, '');
   
 	return name;
 }

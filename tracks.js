@@ -20,7 +20,7 @@ function refreshDB() {
 	});
 }
 
-exports.refreshList = function() {
+exports.refreshList = function(callback) {
 
 	refreshDB();
 
@@ -44,10 +44,8 @@ const connection = mysql.createConnection({
 			for (let i=0; i<length; i++){
 				tracks[i] = results[i].paths;
 			}
-			console.log('PATHS : ' + tracks);
-		}
 		connection.end();
-		return;
+		callback();
 	});
 }
 

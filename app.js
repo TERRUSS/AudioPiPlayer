@@ -10,7 +10,7 @@ const io = require('socket.io')(server);
 
 const { exec } = require('child_process');
 
-const Tracks = require('./tracks');
+const { refreshList } = require('./tracks');
 
 app.use(express.static(__dirname + '/public'));
 
@@ -39,13 +39,10 @@ io.sockets.on('connection', (socket) => {
  
   if (tracks != ''){
     socket.emit('trackList', tracks);
-  	console.log('TRACKS = ' + tracks);
   } else {
-   Tracks.refreshList();
-   setTimeout(()=>{
-	console.log("APP : " + tracks);
+   refreshList(function () {
     	socket.emit('trackList', tracks);
-   }, 1000);
+   })
   }
 
 	
@@ -53,39 +50,42 @@ io.sockets.on('connection', (socket) => {
   socket.on('reload', () => {
 	console.log('reload');
 
-	  tracks = Tracks.refreshList();
+	  tracks = refreshList("oi") 
 	setTimeout(()=>{
 	  socket.broadcast.emit('trackList', tracks);
 	  socket.emit('trackList', tracks);
- 	});
+ 	}, 1000);
   });
 
 
   //change song
   socket.on("chSong", (path) => {
-    console.log("chSong : " + path);
-
-	exec('killall play', (error, stdout, stderr) => {
-		if (error) {
-			console.log('ERROR : ' + error);
-		}
-		return;
-	});
+	
+	if ( status.playing ) {
+		exec('killall play', (error, stdout, stderr) => {
+			if (error) {
+				console.log('ERROR : ' + error);
+			}
+			return;
+		});
+	}
 
      exec('play ' + '"' + path + '"', (error, stdout, stderr) => {
        if (error) {
          console.log("ERROR : " + error);
     
        	 socket.broadcast.emit('error', ('play', stderr));
-         return;
+	       return;
        }
     
       status.playing = path;
       status.pause = false;
-      console.log("STDOUT : " + stdout);
-      console.log("STDERR : " + stderr);
-      socket.broadcast.emit('chSong', path);
-      socket.emit('chSong', path);
+      
+	     console.log("STDOUT : " + stdout);
+	      console.log("STDERR : " + stderr);
+
+	    sudosocket.broadcast.emit('chSong', path);
+      		socket.emit('chSong', path);
 	socket.broadcast.emit('status', status);
 	socket.emit('status', status);
     });
@@ -93,12 +93,13 @@ io.sockets.on('connection', (socket) => {
 
   //pause
   socket.on('pause', () => {
-
-	exec('killall play', (error, stdout, stderr) => {
-		if (error) {
-			console.log('ERROR : ' + error);
-		}
-	});
+	if ( status.playing ) {
+		exec('killall play', (error, stdout, stderr) => {
+			if (error) {
+				console.log('ERROR : ' + error);
+			}
+		});
+	}
 
     socket.broadcast.emit('pause', status.pause);
     socket.emit('pause', status.pause);
