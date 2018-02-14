@@ -46,8 +46,10 @@ const connection = mysql.createConnection({
 			}
 		connection.end();
 		callback();
+		}
 	});
 }
+
 
 /*
  * TODO: the 'refresh' button on index.html
