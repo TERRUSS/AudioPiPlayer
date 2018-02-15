@@ -21,7 +21,6 @@
 	});
 
 
-  //chhht, i'm handeling errors...
 	var status = {
 	  playing: null,
 	  pause: true
@@ -40,6 +39,7 @@
 	      socket.emit('trackList', tracks);
       })
 	  }
+		socket.emit('status', status);
 
 
 	  //refresh the tracklist
@@ -57,14 +57,18 @@
 	  socket.on("chSong", (path) => {
 
 	    if (status.pause == false) {
+				console.log("Track is playing. Killing it.");
 	      exec('killall play', (error, stdout, stderr) => {
 	        if (error) {
 	          console.log('ERROR : ' + error);
 	        }
 	        return;
 	      });
-	    }
+	    } else {
+				console.log('No track playing.');
+			}
 
+			console.log("Playing " + path);
 	    exec('play ' + '"' + path + '"', (error, stdout, stderr) => {
 	      if (error) {
 	        console.log("ERROR : " + error);
@@ -76,7 +80,6 @@
 	      status.playing = path;
 	      status.pause = false;
 
-	      console.log("STDOUT : " + stdout);
 	      console.log("STDERR : " + stderr);
 
 	      sudosocket.broadcast.emit('chSong', path);
@@ -94,13 +97,15 @@
           console.log('ERROR : ' + error);
         }
       });
-    }
+
+			status.pause = true;
+			status.playing  == null;
+    } else {
+			//TODO: handle pause .. :/
+		}
 
     socket.broadcast.emit('pause', status.pause);
     socket.emit('pause', status.pause);
-
-    status.pause = status.pause ? false : true; //for newies
-
 	  });
 
 	});
