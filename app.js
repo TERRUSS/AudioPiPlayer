@@ -46,11 +46,10 @@
 	  socket.on('reload', () => {
 	    console.log('reload');
 
-	    tracks = refreshList("oi")
-	    setTimeout(() => {
-	      socket.broadcast.emit('trackList', tracks);
-	      socket.emit('trackList', tracks);
-	    }, 1000);
+	    refreshList(function () {
+				socket.emit('trackList', tracks);
+				socket.broadcast.emit('trackList', tracks);
+			})
 	  });
 
 
