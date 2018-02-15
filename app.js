@@ -69,24 +69,13 @@
 			}
 
 			console.log("Playing " + path);
-	    exec('play ' + '"' + path + '"', (error, stdout, stderr) => {
-	      if (error) {
-	        console.log("ERROR : " + error);
+	    exec('play ' + '"' + path + '"'); //f*ck errors hanndeling
 
-	        socket.broadcast.emit('error', ('play', stderr));
-	        return;
-	      }
+      status.playing = path;
+      status.pause = false;
 
-	      status.playing = path;
-	      status.pause = false;
-
-	      console.log("STDERR : " + stderr);
-
-	      sudosocket.broadcast.emit('chSong', path);
-	      socket.emit('chSong', path);
-	      socket.broadcast.emit('status', status);
-	      socket.emit('status', status);
-	    });
+      socket.broadcast.emit('status', status);
+      socket.emit('status', status);
 	  });
 
 	  //pause
