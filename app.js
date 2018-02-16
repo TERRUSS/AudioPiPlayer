@@ -8,9 +8,9 @@
 	const server = http.createServer(app);
 	const io = require('socket.io')(server);
 
-	const { exec } = require('child_process');
-
-	const { refreshList } = require('./tracks');
+	const { refreshList } = require('./db');
+	const Track = require('./track');
+	const Timer = require('./timer');
 
 	app.use(express.static(__dirname + '/public'));
 
@@ -21,15 +21,16 @@
 	});
 
 
-	var status = {
+	global.status = {
+		pause: true,
 	  playing: null,
-	  pause: true
+		timestamp: null
 	}
+	global.tracks = [];
 
 
 	//and the interseting stuff begin...
 
-	global.tracks = [];
 
 	io.sockets.on('connection', (socket) => {
 	  if (tracks != '') {
@@ -58,45 +59,38 @@
 
 	    if (status.pause == false) {
 				console.log("Track is playing. Killing it.");
-	      exec('killall play', (error, stdout, stderr) => {
-	        if (error) {
-	          console.log('ERROR : ' + error);
-	        }
-	        return;
-	      });
+	      Track.stop();
+				Timer.stop();
 	    } else {
 				console.log('No track playing.');
 			}
 
 			console.log("Playing " + path);
-	    exec('play ' + '"' + path + '"'); //f*ck errors hanndeling
-
-      status.playing = path;
-      status.pause = false;
-
-      socket.broadcast.emit('status', status);
-      socket.emit('status', status);
+			Track.play(path);
+			socket.broadcast.emit('status', status);
+			socket.emit('status', status);
 	  });
 
 	  //pause
   socket.on('pause', () => {
     if (status.pause == false) {
-      exec('killall play', (error, stdout, stderr) => {
-        if (error) {
-          console.log('ERROR : ' + error);
-        }
-      });
+			console.log("track stoped at " + status.timestamp);
+      Track.stop();
+			Timer.pause();
 
-			status.pause = true;
-			status.playing  == null;
+			socket.broadcast.emit('status', status);
+			socket.emit('status', status);
+
     } else {
-			//TODO: handle pause .. :/
+			console.log("playing track");
+
+			Track.play(status.playing, status.timestamp)	//blocking function
+
+			socket.broadcast.emit('status', status);
+			socket.emit('status', status);
 		}
-
-    socket.broadcast.emit('pause', status.pause);
-    socket.emit('pause', status.pause);
-	  });
-
 	});
 
-	server.listen(80);
+});
+
+server.listen(80);
