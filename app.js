@@ -19,20 +19,28 @@
 	app.get('/', (req, res) => {
 	  res.sendFile(__dirname + '/index.html');
 	});
+	app.get('/mobile', (req, res) => {
+	  res.sendFile(__dirname + '/mobile.html');
+	});
 
 
 	global.status = {
 		pause: true,
 	  playing: null,
-		timestamp: null
+		title: null,
+		timestamp: null,
+		duration: null
 	}
 	global.tracks = [];
+	global.artists = [];
+	global.albums = [];
 
 
 	//and the interseting stuff begin...
 
 
 	io.sockets.on('connection', (socket) => {
+		console.log("websocket conection");
 	  if (tracks != '') {
 	    socket.emit('trackList', tracks);
 	  } else {
@@ -41,7 +49,6 @@
       })
 	  }
 		socket.emit('status', status);
-
 
 	  //refresh the tracklist
 	  socket.on('reload', () => {
@@ -55,7 +62,7 @@
 
 
 	  //change song
-	  socket.on("chSong", (path) => {
+	  socket.on("chSong", (track) => {
 
 	    if (status.pause == false) {
 				console.log("Track is playing. Killing it.");
@@ -65,8 +72,8 @@
 				console.log('No track playing.');
 			}
 
-			console.log("Playing " + path);
-			Track.play(path);
+			console.log("Playing " + track.title);
+			Track.play(track);
 			socket.broadcast.emit('status', status);
 			socket.emit('status', status);
 	  });
@@ -84,7 +91,7 @@
     } else {
 			console.log("playing track");
 
-			Track.play(status.playing, status.timestamp)	//blocking function
+			Track.play({path: status.playing, name: status.title}, status.timestamp)	//blocking function
 
 			socket.broadcast.emit('status', status);
 			socket.emit('status', status);

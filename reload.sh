@@ -1,25 +1,24 @@
 
 	#setup db
 
-#mysql -u root "CREATE DATABASE IF NOT EXISTS audio_pi_player;"
+	mysql -u root -e "USE audio_pi_player; CREATE TABLE IF NOT EXISTS tracks( id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT, path TEXT,PRIMARY KEY (id) );"
 
-mysql -u root -e "USE audio_pi_player; CREATE TABLE IF NOT EXISTS paths( id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT, paths TEXT, PRIMARY KEY (id) );"
-
-mysql -u root -e "USE audio_pi_player; TRUNCATE TABLE paths;"
-
+	mysql -u root -e "USE audio_pi_player; TRUNCATE TABLE tracks;"
 
 	#get all audio files in ~/Music
 
 R=$IFS	#use \n as separator instead of space
 IFS='
 '
+	list=`find /home/terruss/Musique -iname "*.mp3"`
 
-list=`find /home/pi/Music -iname "*.mp3"`
+	for path in $list; do
+		#insert $path in the DB
+		echo "adding $path to db"
+		mysql -u root -e "USE audio_pi_player; INSERT INTO tracks(path) VALUES ('$path');"
 
-for path in $list; do
-	#insert $path in the DB	
-	mysql -u root -e "USE audio_pi_player; INSERT INTO paths(paths) VALUES ('$path');"
-
-done
+	done
 
 IFS=$R
+
+echo "DB RELOADED"
