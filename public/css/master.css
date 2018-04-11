@@ -1,13 +1,20 @@
 
-body{
+body {
   background-color: #1e2328;
   color: #d5d5d5;
   font-family: 'Roboto Mono', monospace;
+  font-size: 1em;
+
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select:none;
+  -o-user-select:none;
+
+  display: flex;
 }
 
-header{
+header {
   background-color: #f04d4e;
-
   position: absolute;
   top: 0;
   left: 0;
@@ -15,59 +22,95 @@ header{
   height: 100px;
 }
 
-footer{
+footer {
   background-color: #ef4142;
-
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
   height: 50px;
-
   font-size: 1.2em;
   text-align: right;
   padding-top: 20px;
   padding-right: 20px;
 }
 
-
-
-
-#logo{
+#logo {
   position: absolute;
   top: 30px;
   font-size: 1.5em;
 }
 
-#current{
+#current {
   position: absolute;
   top: 30px;
-  left:40%;
+  left: 40%;
 }
 
-#tracks{
-  position: absolute;
-  top: 100px;
+.list {
+  border: solid 1px;
+  margin-top: 130px;
+  padding-top: 20px;
+  margin-bottom: 80px;
+  padding-bottom: 20px;
+  margin-left: 40px;
+  margin-right: 0;
+  padding-left: 10px;
+  overflow-x: hidden;
 
-  padding: 50px;
 }
 
-#tracklist p{
+.list div{
+  max-height: 60vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+#tracks {
+  flex: 1;
+  margin-left: 50px;
+}
+
+#artists {
+  flex : 1;
+}
+
+#albums {
+  flex: 1;
+  margin-right: 50px;
+}
+
+#tracksList{
+  margin-right: -50px;
+}
+
+.list p {
   margin: 10px;
   padding: 3px;
 }
-.list p:hover{
+
+.list p:hover {
   background-color: #3d3d3d;
 }
 
-#pause{
+#pause {
   font-size: 1.5em;
   text-align: center;
 }
-#pause:hover{
+
+#pause:hover {
   background-color: #ed6464;
 }
 
-.clickable{
+.clickable {
   cursor: pointer;
+}
+
+.shelf{
+  font-size: 0.8em;
+  padding-left: 10px;
+  max-height: 60vh;
+  margin-right: -50px;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
