@@ -19,6 +19,6 @@ IFS='
 
 	done
 
-IFS=$R
+IFS=$R  #reset usuak separator
 
 echo "DB RELOADED"
